@@ -1,0 +1,41 @@
+{
+  "$schema": "../../node_modules/@tauri-apps/cli/schema.json",
+  "build": {
+    "beforeBuildCommand": "npm run build",
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:5173",
+    "distDir": "../dist"
+  },
+  "package": {
+    "productName": "ContentCreator",
+    "version": "1.0.0"
+  },
+  "tauri": {
+    "allowlist": {
+      "all": false,
+      "shell": {
+        "all": false,
+        "open": true
+      },
+      "dialog": {
+        "all": true
+      },
+      "fs": {
+        "all": false,
+        "readFile": true,
+        "writeFile": true,
+        "readDir": true
+      }
+    },
+    "windows": [
+      {
+        "title": "Content Creator",
+        "width": 1200,
+        "height": 800,
+        "resizable": true,
+        "fullscreen": false,
+        "titleBarStyle": "overlay"
+      }
+    ]
+  }
+}
