@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.core.database import init_db
+from app.i18n.middleware import I18nMiddleware
 from app.api import projects, chapters, generate, locks, memory, feedback
 
 
@@ -20,6 +21,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# 国际化中间件
+app.add_middleware(I18nMiddleware)
+
 app.include_router(projects.router, prefix="/api/v1/projects", tags=["projects"])
 app.include_router(chapters.router, prefix="/api/v1", tags=["chapters"])
 app.include_router(generate.router, prefix="/api/v1/generate", tags=["generate"])
@@ -36,3 +40,16 @@ async def startup_event():
 @app.get("/health")
 async def health_check():
     return {"status": "healthy", "service": settings.app_name}
+
+
+@app.get("/i18n/languages")
+async def get_supported_languages():
+    """获取支持的语言列表"""
+    from app.i18n import Language, t
+    return {
+        "languages": [
+            {"code": lang.value, "name": t(f"common.language_{lang.value}")}
+            for lang in Language
+        ],
+        "default": "zh",
+    }
