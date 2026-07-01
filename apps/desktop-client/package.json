@@ -1,0 +1,33 @@
+{
+  "name": "content-creation-desktop",
+  "version": "1.0.0",
+  "description": "Content Creation Platform Desktop Client",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "tauri": "tauri"
+  },
+  "dependencies": {
+    "@element-plus/icons-vue": "^2.3.1",
+    "diff2html": "^3.4.33",
+    "dompurify": "^3.1.6",
+    "element-plus": "^2.8.3",
+    "marked": "^14.1.2",
+    "pinia": "^2.2.4",
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.0"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.1.1",
+    "@types/dompurify": "^3.0.5",
+    "@types/node": "^22.15.3",
+    "@vitejs/plugin-vue": "^6.0.0",
+    "@vue/tsconfig": "^0.9.1",
+    "sass": "^1.88.0",
+    "typescript": "^5.8.2",
+    "vite": "^8.0.0",
+    "vue-tsc": "^3.3.5"
+  }
+}

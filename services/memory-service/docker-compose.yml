@@ -1,0 +1,104 @@
+version: "3.8"
+
+services:
+  qdrant:
+    image: qdrant/qdrant:v1.7.4
+    container_name: memory-qdrant
+    restart: unless-stopped
+    ports:
+      - "${QDRANT_PORT:-6333}:6333"
+      - "${QDRANT_GRPC_PORT:-6334}:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    environment:
+      QDRANT__SERVICE__GRPC_PORT: 6334
+      QDRANT__SERVICE__HTTP_PORT: 6333
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6333/readyz"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  memory-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: memory-service
+    restart: unless-stopped
+    ports:
+      - "${MEMORY_SERVICE_PORT:-8001}:8001"
+    environment:
+      QDRANT_HOST: qdrant
+      QDRANT_PORT: 6333
+      QDRANT_GRPC_PORT: 6334
+      QDRANT_COLLECTION_NAME: memory_entities
+      QDRANT_VECTOR_SIZE: ${EMBEDDING_VECTOR_SIZE:-1536}
+      QDRANT_DISTANCE: Cosine
+
+      EMBEDDING_PROVIDER: ${EMBEDDING_PROVIDER:-ollama}
+      EMBEDDING_API_URL: http://ollama:11434/api/embeddings
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-nomic-embed-text}
+      EMBEDDING_BATCH_SIZE: 32
+
+      RAG_TOP_K: 5
+      RAG_SCORE_THRESHOLD: 0.7
+
+      REDIS_URL: redis://redis:6379/1
+      ENABLE_CACHE: ${ENABLE_CACHE:-true}
+    depends_on:
+      qdrant:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: memory-ollama
+    restart: unless-stopped
+    ports:
+      - "${OLLAMA_PORT:-11434}:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      OLLAMA_HOST: 0.0.0.0:11434
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  redis:
+    image: redis:7-alpine
+    container_name: memory-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-redis123}
+    ports:
+      - "${MEMORY_REDIS_PORT:-6380}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  qdrant_data:
+    driver: local
+  ollama_data:
+    driver: local
+  redis_data:
+    driver: local
