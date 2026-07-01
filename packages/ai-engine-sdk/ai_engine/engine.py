@@ -21,11 +21,15 @@ class AIEngine:
                 api_key=kwargs.get("api_key", ""),
                 base_url=kwargs.get("base_url", "https://api.openai.com/v1"),
                 model=kwargs.get("model", "gpt-4o"),
+                max_retries=kwargs.get("max_retries", 3),
+                timeout=kwargs.get("timeout", 120.0),
             )
         elif provider_type == "ollama":
             provider = OllamaProvider(
                 base_url=kwargs.get("base_url", "http://localhost:11434"),
                 model=kwargs.get("model", "llama3"),
+                max_retries=kwargs.get("max_retries", 3),
+                timeout=kwargs.get("timeout", 300.0),
             )
         else:
             raise ValueError(f"Unknown provider type: {provider_type}")

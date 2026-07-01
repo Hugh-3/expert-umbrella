@@ -19,9 +19,15 @@ class Settings(BaseSettings):
     ai_model: str = "gpt-4o"
     ai_max_tokens: int = 4096
     ai_temperature: float = 0.7
+    ai_max_retries: int = 3
+    ai_timeout: int = 120
 
     ollama_base_url: str = "http://localhost:11434"
     ollama_model: str = "llama3"
+    ollama_max_retries: int = 3
+    ollama_timeout: int = 300
+
+    export_temp_dir: str = "./temp/exports"
 
 
 settings = Settings()

@@ -39,7 +39,13 @@ from app.services.feedback_service import (
     run_self_check,
 )
 from app.services.timeline_service import get_project_timeline
-from app.services.ai_service import get_ai_engine, get_generation_params
+from app.services.ai_service import get_ai_engine, get_generation_params, reset_ai_engine
+from app.services.export_service import (
+    export_project_to_epub,
+    export_project_to_pdf,
+    ensure_export_dir,
+    sanitize_filename,
+)
 
 __all__ = [
     "get_projects",
@@ -75,4 +81,9 @@ __all__ = [
     "get_project_timeline",
     "get_ai_engine",
     "get_generation_params",
+    "reset_ai_engine",
+    "export_project_to_epub",
+    "export_project_to_pdf",
+    "ensure_export_dir",
+    "sanitize_filename",
 ]

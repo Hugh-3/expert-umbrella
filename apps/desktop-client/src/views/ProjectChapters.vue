@@ -1,15 +1,18 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Plus, VideoPlay, DocumentChecked, Edit } from '@element-plus/icons-vue'
+import { Plus, VideoPlay, DocumentChecked, Edit, Download } from '@element-plus/icons-vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { useChapterStore } from '@/stores/chapter'
 import GenerationModal from '@/components/GenerationModal.vue'
+import { exportApi } from '@/api/http'
 
 const route = useRoute()
 const router = useRouter()
 const chapterStore = useChapterStore()
 const showGenerationModal = ref(false)
 const selectedChapterId = ref<string | undefined>(undefined)
+const exporting = ref(false)
 
 onMounted(async () => {
   const projectId = route.params.id as string
@@ -38,6 +41,46 @@ function handleGenerationComplete(content: string) {
   showGenerationModal.value = false
 }
 
+async function handleExport(format: 'epub' | 'pdf') {
+  const projectId = route.params.id as string
+  if (chapterStore.chapters.length === 0) {
+    ElMessage.warning('没有可导出的章节')
+    return
+  }
+  try {
+    exporting.value = true
+    if (format === 'epub') {
+      await exportApi.exportEpub(projectId)
+    } else {
+      await exportApi.exportPdf(projectId)
+    }
+    ElMessage.success(`导出${format.toUpperCase()}成功`)
+  } catch (e: any) {
+    ElMessage.error(e.message || '导出失败')
+  } finally {
+    exporting.value = false
+  }
+}
+
+async function handleExportMenu() {
+  try {
+    const { value } = await ElMessageBox({
+      title: '导出选项',
+      message: '请选择导出格式',
+      showCancelButton: true,
+      confirmButtonText: 'EPUB',
+      cancelButtonText: 'PDF',
+      distinguishCancelAndClose: true,
+    })
+    if (value === 'confirm') {
+      handleExport('epub')
+    } else if (value === 'cancel') {
+      handleExport('pdf')
+    }
+  } catch {
+  }
+}
+
 function getStatusText(status: string) {
   const map: Record<string, string> = {
     outline: '大纲',
@@ -63,10 +106,20 @@ function getStatusClass(status: string) {
   <div class="chapters-page">
     <div class="page-header">
       <h2 class="page-title">章节管理</h2>
-      <button class="add-btn" @click="handleAddChapter">
-        <Plus />
-        添加章节
-      </button>
+      <div class="header-actions">
+        <button class="export-btn" @click="handleExport('epub')" :disabled="exporting">
+          <Download />
+          导出EPUB
+        </button>
+        <button class="export-btn" @click="handleExport('pdf')" :disabled="exporting">
+          <Download />
+          导出PDF
+        </button>
+        <button class="add-btn" @click="handleAddChapter">
+          <Plus />
+          添加章节
+        </button>
+      </div>
     </div>
 
     <div v-if="chapterStore.loading" class="loading-state">
@@ -145,6 +198,12 @@ function getStatusClass(status: string) {
   color: var(--text-primary);
 }
 
+.header-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
 .add-btn {
   display: flex;
   align-items: center;
@@ -161,6 +220,31 @@ function getStatusClass(status: string) {
 
 .add-btn:hover {
   background: var(--primary-dark);
+}
+
+.export-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  background: #fff;
+  color: var(--text-primary);
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.export-btn:hover:not(:disabled) {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.export-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .loading-state, .empty-state {

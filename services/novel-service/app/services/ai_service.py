@@ -13,16 +13,25 @@ def get_ai_engine() -> AIEngine:
         if settings.ai_provider == "openai":
             kwargs = {
                 "api_key": settings.ai_api_key,
-                "base_url": settings.ai_base_url,
+                "base_url": settings.ai_base_url or "https://api.openai.com/v1",
                 "model": settings.ai_model,
+                "max_retries": settings.ai_max_retries,
+                "timeout": float(settings.ai_timeout),
             }
         elif settings.ai_provider == "ollama":
             kwargs = {
                 "base_url": settings.ollama_base_url,
                 "model": settings.ollama_model,
+                "max_retries": settings.ollama_max_retries,
+                "timeout": float(settings.ollama_timeout),
             }
         _ai_engine = AIEngine.create(settings.ai_provider, **kwargs)
     return _ai_engine
+
+
+def reset_ai_engine() -> None:
+    global _ai_engine
+    _ai_engine = None
 
 
 def get_generation_params(custom_params: dict | None = None) -> GenerationParams:

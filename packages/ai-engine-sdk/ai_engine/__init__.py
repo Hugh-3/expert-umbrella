@@ -1,6 +1,6 @@
 from ai_engine.engine import AIEngine
 from ai_engine.types import Message, GenerationParams, GenerationResult, StreamChunk, Role
-from ai_engine.providers import BaseProvider, MockProvider, OpenAIProvider, OllamaProvider
+from ai_engine.providers import BaseProvider, MockProvider, OpenAIProvider, OllamaProvider, AIProviderError
 
 __all__ = [
     "AIEngine",
@@ -13,4 +13,5 @@ __all__ = [
     "MockProvider",
     "OpenAIProvider",
     "OllamaProvider",
+    "AIProviderError",
 ]
