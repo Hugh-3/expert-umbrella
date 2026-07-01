@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { Plus, Reading, Trophy } from '@element-plus/icons-vue'
+import { Plus, Reading, Trophy, Notebook as BookOpen } from '@element-plus/icons-vue'
 import { useProjectStore } from '@/stores/project'
 import Sidebar from '@/components/Sidebar.vue'
 import ProjectCard from '@/components/ProjectCard.vue'

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Clock, Reading, Folder, Setting } from '@element-plus/icons-vue'
+import { Clock, Reading, Folder, Setting, Notebook as BookOpen, Coin as Database } from '@element-plus/icons-vue'
 import { useProjectStore } from '@/stores/project'
 import Sidebar from '@/components/Sidebar.vue'
 
